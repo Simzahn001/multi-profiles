@@ -1,7 +1,12 @@
 name: multiProfile
 version: '${project.version}'
-main: me.simzahn.multiprofile.MultiProfile
+main: me.simzahn.multiprofile.Main
 api-version: '1.20'
 prefix: MultiProfile
-authors: [Simzahn]
-description: A plugin to allow Players to have mutiple Profiles with seperate Inventories, Health and Location.
+authors: [ Simzahn ]
+description: 'A plugin to allow Players to have mutiple Profiles with seperate Inventories, Health and Location.'
+commands:
+  switch:
+    usage: Please use /switch <profile>!
+    aliases: [ sw ]
+    description: Switch to another Profile.
