@@ -6,7 +6,7 @@ prefix: MultiProfile
 authors: [ Simzahn ]
 description: 'A plugin to allow Players to have mutiple Profiles with seperate Inventories, Health and Location.'
 commands:
-  switch:
-    usage: Please use /switch <profile>!
+  profile:
+    usage: Please use /profile [list] | [switch <profile>]!
     aliases: [ sw ]
-    description: Switch to another Profile.
+    description: List your profiles or switch to another Profile.

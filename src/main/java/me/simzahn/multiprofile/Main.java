@@ -1,10 +1,7 @@
 package me.simzahn.multiprofile;
 
-import me.simzahn.multiprofile.command.SwitchCommand;
+import me.simzahn.multiprofile.command.ProfileCommand;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.w3c.dom.stylesheets.LinkStyle;
-
-import java.util.List;
 
 public final class Main extends JavaPlugin {
 
@@ -15,7 +12,7 @@ public final class Main extends JavaPlugin {
 
         plugin = this;
 
-        getCommand("switch").setExecutor(new SwitchCommand());
+        getCommand("profile").setExecutor(new ProfileCommand());
 
     }
 
