@@ -3,6 +3,7 @@ package me.simzahn.multiprofile;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import me.simzahn.multiprofile.utils.ConfigUtils;
 import me.simzahn.multiprofile.utils.Serializer;
+import org.apache.commons.lang3.ObjectUtils;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -25,9 +26,22 @@ public class Profile {
         this.name = name;
         this.playerUUID = player.getUniqueId().toString();
 
+        // retrieve the default values from the config
+        // the default values are set via the command /profile defaults
+        YamlConfiguration config = ConfigUtils.loadNewConfig(new PathCreator().getPathToDefaultConfig());
+
+        try {
+            inventory = Serializer.itemStackArrayFromBase64(config.getString("defaults.inventory"));
+        } catch (IOException | NullPointerException e) {
+            inventory = new ItemStack[] {};
+        }
+        try {
+            location = Serializer.locationFromBase64(config.getString("defaults.location"));
+        } catch (IOException | NullPointerException e) {
+            location = player.getLocation();
+        }
+
         health = 20;
-        inventory = new ItemStack[] {};
-        location = player.getLocation();
 
         if (!save()) {
             throw new RuntimeException("Could not save profile");

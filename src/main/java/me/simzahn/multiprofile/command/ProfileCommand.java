@@ -1,7 +1,10 @@
 package me.simzahn.multiprofile.command;
 
+import me.simzahn.multiprofile.PathCreator;
 import me.simzahn.multiprofile.Profile;
 import me.simzahn.multiprofile.ProfileManager;
+import me.simzahn.multiprofile.utils.ConfigUtils;
+import me.simzahn.multiprofile.utils.Serializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.TextColor;
@@ -10,6 +13,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -103,6 +107,37 @@ public class ProfileCommand implements CommandExecutor, TabCompleter {
                     )));
                 }
                 return true;
+            } else if (strings[0].equals("defaults")) {
+
+                if (!commandSender.hasPermission("multiprofile.commands.configureDefaults")) {
+                    commandSender.sendMessage(Component.text(
+                            "You do not have permission to use this command!",
+                            TextColor.color(255, 0, 0)
+                    ));
+                }
+
+                YamlConfiguration config = ConfigUtils.loadNewConfig(new PathCreator().getPathToDefaultConfig());
+
+                if (strings[1].equals("inventory")) {
+
+                    config.set("defaults.inventory", Serializer.itemStackArrayToBase64(player.getInventory().getContents()));
+                    commandSender.sendMessage(Component.text(
+                            "Your inventory has been saved as the default inventory!",
+                            TextColor.color(0, 255, 0)
+                    ));
+
+                } else if (strings[1].equals("location")) {
+
+                    config.set("defaults.location", Serializer.locationToBase64(player.getLocation()));
+                    commandSender.sendMessage(Component.text(
+                            "Your location has been saved as the default location!",
+                            TextColor.color(0, 255, 0)
+                    ));
+
+                }
+
+                ConfigUtils.saveConfig(config, new PathCreator().getPathToDefaultConfig().toFile());
+                return true;
             }
 
         }
@@ -148,6 +183,11 @@ public class ProfileCommand implements CommandExecutor, TabCompleter {
                 List<String> list = new ArrayList<>();
                 list.add("switch");
                 list.add("list");
+
+                if (sender.hasPermission("multiprofile.commands.configureDefaults")) {
+                    list.add("defaults");
+                }
+
                 return list;
 
             }else if (args.length == 2) {
@@ -161,6 +201,13 @@ public class ProfileCommand implements CommandExecutor, TabCompleter {
                     ProfileManager profileManager = new ProfileManager(player);
 
                     return profileManager.getProfiles();
+
+                } else if (args[0].equals("defaults")) {
+
+                    List<String> list = new ArrayList<>();
+                    list.add("inventory");
+                    list.add("location");
+                    return list;
 
                 }
 
