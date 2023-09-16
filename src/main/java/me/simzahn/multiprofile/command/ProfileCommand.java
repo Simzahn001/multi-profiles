@@ -39,7 +39,11 @@ public class ProfileCommand implements CommandExecutor, TabCompleter {
 
                 ProfileManager profileManager = new ProfileManager(player);
 
-                player.sendMessage(Component.text("Your profiles:", TextColor.color(255, 171, 0), TextDecoration.BOLD));
+                int maxProfiles = ConfigUtils.loadNewConfig(new PathCreator().getPathToDefaultConfig()).getInt("limit");
+                int currentProfiles = new ProfileManager(player).getProfiles().size();
+
+                player.sendMessage(Component.text("Your profiles:", TextColor.color(255, 171, 0), TextDecoration.BOLD)
+                        .append(Component.text(" (" + currentProfiles + "/" + maxProfiles + ")", TextColor.color(255, 171, 0))));
 
                 profileManager.getProfiles().forEach(profileName -> {
 
@@ -91,20 +95,7 @@ public class ProfileCommand implements CommandExecutor, TabCompleter {
                             "[Create new profile with name " + strings[1] + "]",
                             TextColor.color(114, 255, 58),
                             TextDecoration.BOLD
-                    ).clickEvent(ClickEvent.callback(
-                            audience -> {
-                                new Profile(player, strings[1]);
-                                player.sendMessage(Component.text(
-                                        "Your profile has been created successfully!",
-                                        TextColor.color(0, 255, 0),
-                                        TextDecoration.BOLD
-                                ));
-                                player.sendMessage(Component.text(
-                                                "You can now switch to it with /switch " + strings[1] + "!",
-                                                TextColor.color(0, 170, 196)
-                                ));
-                            }
-                    )));
+                    ).clickEvent(ClickEvent.runCommand("/profile create " + strings[1] + " " + player.getUniqueId().toString())));
                 }
                 return true;
             } else if (strings[0].equals("defaults")) {
@@ -138,6 +129,43 @@ public class ProfileCommand implements CommandExecutor, TabCompleter {
 
                 ConfigUtils.saveConfig(config, new PathCreator().getPathToDefaultConfig().toFile());
                 return true;
+            } else if (strings[0].equals("limit")) {
+
+                if (!commandSender.hasPermission("multiprofile.commands.limit")) {
+                    commandSender.sendMessage(Component.text(
+                            "You do not have permission to use this command!",
+                            TextColor.color(255, 0, 0)
+                    ));
+                }
+
+                YamlConfiguration config = ConfigUtils.loadNewConfig(new PathCreator().getPathToDefaultConfig());
+
+                if (strings[1].equals("none")) {
+                    config.set("limit", -1);
+                    commandSender.sendMessage(Component.text(
+                            "The profile limit has been set to none!",
+                            TextColor.color(0, 255, 0)
+                    ));
+                } else {
+                    try {
+                        int limit = Integer.parseInt(strings[1]);
+                        config.set("limit", limit);
+                        commandSender.sendMessage(Component.text(
+                                "The profile limit has been set to " + limit + "!",
+                                TextColor.color(0, 255, 0)
+                        ));
+                    } catch (NumberFormatException e) {
+                        commandSender.sendMessage(Component.text(
+                                "The limit must be a number!",
+                                TextColor.color(255, 0, 0)
+                        ));
+                        return true;
+                    }
+                }
+
+                ConfigUtils.saveConfig(config, new PathCreator().getPathToDefaultConfig().toFile());
+                return true;
+
             }
 
         }
@@ -187,6 +215,9 @@ public class ProfileCommand implements CommandExecutor, TabCompleter {
                 if (sender.hasPermission("multiprofile.commands.configureDefaults")) {
                     list.add("defaults");
                 }
+                if (sender.hasPermission("multiprofile.commands.configureProfileLimit")) {
+                    list.add("limit");
+                }
 
                 return list;
 
@@ -207,6 +238,15 @@ public class ProfileCommand implements CommandExecutor, TabCompleter {
                     List<String> list = new ArrayList<>();
                     list.add("inventory");
                     list.add("location");
+                    return list;
+
+                } else if (args[0].equals("limit")) {
+
+                    List<String> list = new ArrayList<>();
+                    for (int i = 1; i <= 4; i++) {
+                        list.add(String.valueOf(i));
+                    }
+                    list.add("none");
                     return list;
 
                 }
