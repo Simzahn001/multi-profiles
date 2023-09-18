@@ -71,6 +71,15 @@ public class ProfileCommand implements CommandExecutor, TabCompleter {
 
                     profileManager.getProfile(strings[1]).ifPresent(profile -> {
 
+                        if (profile.getName().equalsIgnoreCase(strings[1])) {
+                            player.sendMessage(Component.text(
+                                    "You are already using this profile!",
+                                    TextColor.color(255, 0, 0),
+                                    TextDecoration.BOLD
+                            ));
+                            return;
+                        }
+
                         syncAndSaveCurrentProfile(player);
 
                         profile.apply(player);
@@ -181,23 +190,14 @@ public class ProfileCommand implements CommandExecutor, TabCompleter {
 
         if (profile.isPresent()) {
 
-            System.out.println("current is present");
             profile.get().setData(player);
-            if (profile.get().save()) {
-                System.out.println("current profile saved");
-            } else {
-                System.out.println("current profile not saved");
-            }
+            profile.get().save();
 
         } else {
 
             Profile newProfile = new Profile(player, "default");
             newProfile.setData(player);
-            if (newProfile.save()) {
-                System.out.println("new profile saved");
-            } else {
-                System.out.println("new profile not saved");
-            }
+            newProfile.save();
 
 
         }

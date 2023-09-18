@@ -59,7 +59,7 @@ public class CommandCallback implements Listener {
                 TextDecoration.BOLD
         ));
         player.sendMessage(Component.text(
-                "You can now switch to it with /switch " + profileName + "!",
+                "You can now switch to it with /profile switch " + profileName + "!",
                 TextColor.color(0, 170, 196)
         ));
 
